@@ -4,7 +4,7 @@
 [![Typer](https://img.shields.io/badge/CLI-Typer-white?style=for-the-badge&logo=fastapi)](https://typer.tiangolo.com/)
 [![Gemini AI](https://img.shields.io/badge/AI-Google%20Gemini-orange?style=for-the-badge&logo=google)](https://deepmind.google/technologies/gemini/)
 [![Code Style](https://img.shields.io/badge/Code%20Style-Black-black?style=for-the-badge)](https://github.com/psf/black)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 > **Stop writing commit messages. Let AI do it for you.**
 > A professional CLI tool that analyzes your staged changes and generates semantic Git commit messages using Google Gemini.

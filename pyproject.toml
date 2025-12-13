@@ -1,0 +1,29 @@
+[project]
+name = "git-scribe"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Luis Felipe Patrocinio",email = "patrocinioluisf@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "typer (>=0.20.0,<0.21.0)",
+    "rich (>=14.2.0,<15.0.0)",
+    "google-generativeai (>=0.8.5,<0.9.0)",
+    "python-dotenv (>=1.2.1,<2.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "git_scribe", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2,<10.0.0)",
+    "black (>=25.12.0,<26.0.0)",
+    "isort (>=7.0.0,<8.0.0)"
+]

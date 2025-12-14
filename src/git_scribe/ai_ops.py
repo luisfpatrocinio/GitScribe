@@ -19,33 +19,39 @@ class AIGenerator:
     def generate_commit_message(self, diff: str, context: str = "") -> str:
         """
         Generates a commit message based on the diff and optional context.
+        Styles: 
+        - default: Standard conventional commit.
+        - concise: Only the header (subject line).
+        - detailed: Header + Bullet points body.
         """
-        
-        # The Master Prompt
-        prompt = (
-            "You are an expert programmer writing a commit message following Conventional Commits specification.\n"
-            "Format: <type>(<scope>): <subject>\n\n"
-            "Rules:\n"
-            "1. Use types: feat, fix, chore, docs, style, refactor, perf, test.\n"
-            "2. Keep the subject short (under 72 chars) and imperative (e.g., 'add' not 'added').\n"
-            "3. If provided, use the context to understand the intent.\n"
-            "4. Output ONLY the commit message. No markdown blocks, no 'Here is the commit'.\n"
+
+        base_instruction = (
+            "You are an expert programmer writing a commit message following Conventional Commits.\n"
+            "Format: <type>(<scope>): <subject>\n"
         )
 
+        style_instruction = ""
+        if style == "concise":
+            style_instruction = "IMPORTANT: Output ONLY the subject line. No body, no description. Max 72 chars."
+        elif style == "detailed":
+            style_instruction = "IMPORTANT: Provide a subject line, followed by a blank line, and then a bulleted list (-) explaining the changes in detail."
+        else:
+            style_instruction = "Keep the subject short. If necessary, add a brief body explaining 'why'."
+
         full_prompt = [
-            prompt,
-            f"Context provided by user: {context}" if context else "",
-            "\n--- BEGIN GIT DIFF ---\n",
+            base_instruction,
+            style_instruction,
+            f"Context: {context}" if context else "",
+            "--- GIT DIFF ---",
             diff,
-            "\n--- END GIT DIFF ---\n",
+            "--- END DIFF ---",
             "Generate the commit message:"
         ]
 
         # UI: Show Spinner while AI thinks
-        with self.console.status("[bold cyan]Consulting Gemini AI...[/bold cyan]", spinner="dots"):
+        with self.console.status("[#0ce6f2]Consulting Gemini AI ✍🏼🤖...[/#0ce6f2]", spinner="dots"):
             try:
                 response = self.model.generate_content(full_prompt)
-                cleaned_message = response.text.strip().replace("`", "")
-                return cleaned_message
+                return response.text.strip().replace("`", "")
             except Exception as e:
-                raise RuntimeError(f"Failed to generate message: {str(e)}")
+                raise RuntimeError(f"Gemini Error: {str(e)}")

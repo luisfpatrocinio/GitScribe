@@ -151,3 +151,5 @@ def commit(
                     ui.step_status("Upstream set and pushed!", "done")
             else:
                 ui.console.print(f"[error]Push failed: {e}[/error]")
+    
+    ui.print_footer()

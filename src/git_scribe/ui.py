@@ -64,3 +64,8 @@ def step_status(msg: str, status: str = "wait"):
         color = "red"
         
     console.print(f"[{color}]{icon} {msg}[/{color}]")
+
+def print_footer():
+    """Exibe a assinatura discreta no final da execução."""
+    # justify="right" move the text to the right corner
+    console.print(f"\n[{PALETTE['blue_dark']}]Made by Patro[/]", justify="right")

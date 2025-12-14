@@ -89,3 +89,30 @@ class GitOps:
     @staticmethod
     def get_current_branch() -> str:
         return GitOps._run(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+
+    @staticmethod
+    def get_commit_url() -> Optional[str]:
+        """Calculates the remote URL for the current commit."""
+        try:
+            remote_url = GitOps._run(["git", "config", "--get", "remote.origin.url"], check=False)
+            commit_hash = GitOps._run(["git", "rev-parse", "HEAD"], check=False)
+
+            if not remote_url or not commit_hash:
+                return None
+
+            # Convert SSH to HTTPS (e.g., git@github.com:user/repo.git -> https://github.com/user/repo)
+            if remote_url.startswith("git@"):
+                remote_url = remote_url.replace(":", "/").replace("git@", "https://")
+            
+            # Remove .git suffix if present
+            if remote_url.endswith(".git"):
+                remote_url = remote_url[:-4]
+            
+            # Standardize logic for GitHub/GitLab vs Bitbucket
+            if "bitbucket.org" in remote_url:
+                return f"{remote_url}/commits/{commit_hash}"
+            else:
+                # GitHub, GitLab, and most others use /commit/
+                return f"{remote_url}/commit/{commit_hash}"
+        except Exception:
+            return None

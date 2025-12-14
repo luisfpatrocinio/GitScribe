@@ -143,13 +143,25 @@ def commit(
         try:
             GitOps.push()
             ui.step_status("Push successful!", "done")
+            
+            # Show commit link if available
+            commit_url = GitOps.get_commit_url()
+            if commit_url:
+                ui.print_commit_link(commit_url)
+
         except RuntimeError as e:
             if "no upstream branch" in str(e):
                 current = GitOps.get_current_branch()
                 if auto or Confirm.ask(f"Create upstream 'origin/{current}'?"):
                     GitOps.push(branch=current)
                     ui.step_status("Upstream set and pushed!", "done")
+                    
+                    # Also displays the link if you created upstream now
+                    commit_url = GitOps.get_commit_url()
+                    if commit_url:
+                        ui.print_commit_link(commit_url)
             else:
                 ui.console.print(f"[error]Push failed: {e}[/error]")
-    
+
+    # Footer comes last of all
     ui.print_footer()

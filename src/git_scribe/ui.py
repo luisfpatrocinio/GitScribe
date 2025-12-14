@@ -69,3 +69,8 @@ def print_footer():
     """Exibe a assinatura discreta no final da execução."""
     # justify="right" move the text to the right corner
     console.print(f"\n[{PALETTE['blue_dark']}]Made by Patro[/]", justify="right")
+
+def print_commit_link(url: str):
+    """Exibe o link do commit formatado e clicável."""
+    # O [link=URL]texto[/link] faz o terminal reconhecer como hyperlink
+    console.print(f"\n   🔗 [bold {PALETTE['cyan_bright']}]View on Remote:[/] [link={url}]{url}[/link]")

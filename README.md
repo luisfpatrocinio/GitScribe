@@ -1,4 +1,4 @@
-# GitScribe ✍️🤖
+# GitScribe ✍️ 🤖
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)](https://www.python.org/)
 [![Typer](https://img.shields.io/badge/CLI-Typer-white?style=for-the-badge&logo=fastapi)](https://typer.tiangolo.com/)
@@ -11,89 +11,102 @@
 
 ---
 
-## 🚀 Features
+## 🚀 Features (v0.2.0)
 
-- **🤖 AI-Powered:** Uses Google's Gemini Flash model to understand code logic, not just text changes.
-- **✨ Conventional Commits:** Ensures all messages follow the standard `type(scope): subject` format.
-- **🛡️ Smart Checks:**
-  - Auto-stages files if you forgot `git add .`.
-  - Handles huge diffs by filtering generic large files or asking for context.
-  - Prevents empty commits.
-- **🎨 Beautiful UI:** Built with **Rich** for colorful diff summaries, spinners, and Markdown rendering.
-- **⚡ Workflow Automation:** Can automatically push to remote and handle upstream branch creation.
+- **🤖 AI-Powered:** Uses Google's Gemini Flash model to understand code logic.
+- **✨ Conventional Commits:** Ensures all messages follow the standard `type(scope): subject`.
+- **🏎️ Express Mode (`--auto`):** Automatically stages files, generates the message, commits, and pushes to remote in one go.
+- **🎨 Adaptive Styles:** Choose your output style:
+  - `concise`: Just the header (under 72 chars).
+  - `default`: Standard header + optional body.
+  - `detailed`: Header + detailed bullet points explaining changes.
+- **🛡️ Smart Checks:** Handles huge diffs by filtering generic large files or asking for context.
+- **💎 Cyber Blue UI:** A beautiful, terminal-agnostic interface built with **Rich**.
 
 ---
 
 ## 🛠️ Installation
 
-### Prerequisites
+### Option 1: Global Usage (Recommended)
 
-- Python 3.10+
-- [Poetry](https://python-poetry.org/) (Recommended for dependency management)
-- A Google Gemini API Key (Get it [here](https://aistudio.google.com/app/apikey))
+Use [pipx](https://pypa.github.io/pipx/) to run GitScribe from any directory on your system.
 
-### Setup (Development)
+```bash
+# Clone the repository
+git clone https://github.com/luisfpatrocinio/GitScribe.git
+cd GitScribe
 
-1. **Clone the repository:**
+# Install in editable mode
+pipx install -e .
+```
 
-   ```bash
-   git clone https://github.com/luisfpatrocinio/GitScribe.git
-   cd GitScribe
-   ```
+### Option 2: Development Setup
 
-2. **Install dependencies:**
+If you want to contribute to the code:
 
-   ```bash
-   poetry install
-   ```
+```bash
+# Install dependencies with Poetry
+poetry install
+```
 
-3. **Configure Environment:**
-   Create a `.env` file in the root directory:
-   ```bash
-   cp .env.example .env
-   ```
-   Add your API Key:
-   ```env
-   GEMINI_API_KEY=your_actual_api_key_here
-   ```
+### 🔑 Configuration
+
+Create a `.env` file in the root directory (GitScribe will find it automatically, even when running globally):
+
+```bash
+cp .env.example .env
+```
+
+Add your API Key:
+
+```env
+GEMINI_API_KEY=your_actual_api_key_here
+```
 
 ---
 
 ## 💻 Usage
 
-To run the tool via Poetry:
+If installed via `pipx`, just run:
 
 ```bash
-poetry run git-scribe commit
+git-scribe commit
 ```
 
 ### Options
 
 | Flag        | Short | Description                                                                       |
 | ----------- | ----- | --------------------------------------------------------------------------------- |
+| `--auto`    | `-a`  | **Express Mode:** Automatically stage all, commit, and push without confirmation. |
+| `--style`   | `-s`  | Output style: `concise`, `default`, or `detailed`.                                |
 | `--context` | `-c`  | Provide extra context to the AI (e.g., "Fixing the login bug").                   |
-| `--push`    | `-p`  | Automatically push to remote after a successful commit.                           |
-| `--filter`  | `-f`  | Specific file extension to prioritize if the diff is too large (Default: `.gml`). |
-| `--help`    |       | Show all available commands.                                                      |
+| `--filter`  | `-f`  | Extension to prioritize if the diff is too large (Default: `.gml`).               |
+| `--help`    |       | Show detailed help and commands.                                                  |
 
 ### Examples
 
-**Standard Commit:**
+**Standard Interactive Workflow:**
 
 ```bash
-poetry run git-scribe commit
+git-scribe commit
 ```
 
-**With Context (Helps the AI understand intent):**
+**Express Mode (For confident updates):**
 
 ```bash
-poetry run git-scribe commit -c "Refactoring the authentication middleware for better security"
+git-scribe commit --auto
 ```
 
-**Commit and Push immediately:**
+**Generate a detailed changelog message:**
 
 ```bash
-poetry run git-scribe commit --push
+git-scribe commit --style detailed
+```
+
+**Help the AI understand the intent:**
+
+```bash
+git-scribe commit -c "Refactoring auth middleware to use JWT"
 ```
 
 ---
@@ -105,11 +118,11 @@ This project follows a professional modular architecture:
 ```text
 GitScribe/
 ├── src/git_scribe/
-│   ├── ai_ops.py    # Gemini API integration
+│   ├── ai_ops.py    # Gemini API logic & Prompt engineering
 │   ├── git_ops.py   # Git subprocess wrapper
-│   ├── config.py    # Settings management
+│   ├── config.py    # Environment & Path management
 │   ├── main.py      # Typer CLI entry point
-│   └── ui.py        # Rich UI components
+│   └── ui.py        # Rich UI components & Theme
 ├── tests/           # Unit tests
 ├── pyproject.toml   # Dependencies & Metadata
 └── README.md
@@ -138,3 +151,4 @@ Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
 <p align="center">
   Built with ❤️ by <a href="https://github.com/luisfpatrocinio">Luis Felipe Patrocinio</a>
 </p>
+```

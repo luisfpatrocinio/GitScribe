@@ -3,7 +3,7 @@ from rich.theme import Theme
 from rich.panel import Panel
 from rich.text import Text
 
-# Sua Paleta Cyber Blue
+# Your Cyber Blue Palette
 PALETTE = {
     "white": "#ffffff",
     "cyan_bright": "#0ce6f2",
@@ -28,29 +28,26 @@ console = Console(theme=custom_theme)
 
 def print_banner():
     """
-    Exibe o banner limpo, em linha única e largura total.
-    Sem emojis aqui para garantir estabilidade no Windows.
+    Displays the clean banner, single line, full width.
+    No emojis here to ensure stability on Windows.
     """
     
-    # Montamos apenas o texto essencial
+    # Assemble only essential text
     banner_text = Text.assemble(
         ("GitScribe ", f"bold {PALETTE['white']}"),
         ("v0.2.0", f"dim {PALETTE['cyan_bright']}")
     )
     
-    # Painel Full-Width seguro
+    # Safe Full-Width Panel
     console.print(Panel(
         banner_text,
         style=f"{PALETTE['white']} on {PALETTE['deep_navy']}",
         border_style=PALETTE['blue_vivid'],
         title="[italic]AI-Powered Commit Tool[/italic]",
         title_align="right",
-        expand=True,   # Agora é seguro usar expand=True
-        padding=(0, 1) # Altura mínima (Linha única)
+        expand=True,   # Safe to use expand=True with text only
+        padding=(0, 1) # Minimum height (Single line)
     ))
-    
-    # Removemos a linha inferior separada para ficar mais clean,
-    # já que o painel já tem borda.
 
 def header(text: str):
     console.print(f"\n[{PALETTE['cyan_bright']}]║ {text}[/{PALETTE['cyan_bright']}]")

@@ -35,7 +35,7 @@ def print_banner():
     # Assemble only essential text
     banner_text = Text.assemble(
         ("GitScribe ", f"bold {PALETTE['white']}"),
-        ("v0.2.0", f"dim {PALETTE['cyan_bright']}")
+        ("v0.3.0", f"dim {PALETTE['cyan_bright']}")
     )
     
     # Safe Full-Width Panel

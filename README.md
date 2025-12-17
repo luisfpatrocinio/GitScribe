@@ -11,16 +11,17 @@
 
 ---
 
-## 🚀 Features (v0.2.0)
+## 🚀 Features (v0.3.0)
 
 - **🤖 AI-Powered:** Uses Google's Gemini Flash model to understand code logic.
 - **✨ Conventional Commits:** Ensures all messages follow the standard `type(scope): subject`.
-- **🏎️ Express Mode (`--auto`):** Automatically stages files, generates the message, commits, and pushes to remote in one go.
-- **🎨 Adaptive Styles:** Choose your output style:
-  - `concise`: Just the header (under 72 chars).
-  - `default`: Standard header + optional body.
-  - `detailed`: Header + detailed bullet points explaining changes.
-- **🛡️ Smart Checks:** Handles huge diffs by filtering generic large files or asking for context.
+- **⚡ Direct Workflow:** Just run `git-scribe` and let the magic happen.
+- **🧠 Smart Staging:**
+  - Detects if you forgot to stage files and asks to include them.
+  - `--add` flag to force staging everything.
+  - `--auto` mode handles the full cycle (Stage -> Commit -> Push).
+- **🎨 Adaptive Styles:** Choose your output style (`concise`, `default`, `detailed`).
+- **🛡️ Large Diff Handling:** Filters huge files automatically to prevent API errors.
 - **💎 Cyber Blue UI:** A beautiful, terminal-agnostic interface built with **Rich**.
 
 ---
@@ -67,16 +68,17 @@ GEMINI_API_KEY=your_actual_api_key_here
 
 ## 💻 Usage
 
-If installed via `pipx`, just run:
+If installed via `pipx`, just run the command in any git repository:
 
 ```bash
-git-scribe commit
+git-scribe
 ```
 
 ### Options
 
 | Flag        | Short | Description                                                                       |
 | ----------- | ----- | --------------------------------------------------------------------------------- |
+| `--add`     | `-A`  | **Stage All:** Run `git add .` before generating the message.                     |
 | `--auto`    | `-a`  | **Express Mode:** Automatically stage all, commit, and push without confirmation. |
 | `--style`   | `-s`  | Output style: `concise`, `default`, or `detailed`.                                |
 | `--context` | `-c`  | Provide extra context to the AI (e.g., "Fixing the login bug").                   |
@@ -88,25 +90,25 @@ git-scribe commit
 **Standard Interactive Workflow:**
 
 ```bash
-git-scribe commit
+git-scribe
+```
+
+**Forgot to add files? Stage everything and commit:**
+
+```bash
+git-scribe --add
 ```
 
 **Express Mode (For confident updates):**
 
 ```bash
-git-scribe commit --auto
+git-scribe --auto
 ```
 
 **Generate a detailed changelog message:**
 
 ```bash
-git-scribe commit --style detailed
-```
-
-**Help the AI understand the intent:**
-
-```bash
-git-scribe commit -c "Refactoring auth middleware to use JWT"
+git-scribe --style detailed
 ```
 
 ---
@@ -151,4 +153,3 @@ Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
 <p align="center">
   Built with ❤️ by <a href="https://github.com/luisfpatrocinio">Luis Felipe Patrocinio</a>
 </p>
-```

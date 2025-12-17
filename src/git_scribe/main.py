@@ -34,13 +34,17 @@ def main(
         "", "--context", "-c", 
         help="Provide [bold]extra context[/bold] to the AI (e.g., 'Fixing login bug')."
     ),
+    add_all: bool = typer.Option(
+        False, "--add", "-A",
+        help="[bold]Stage all files[/bold] (git add .) before generating the message."
+    ),
     auto: bool = typer.Option(
         False, "--auto", "-a", 
         help="[bold red]Auto Mode[/bold red]: Automatically stage all files, generate message, commit, and push without confirmation."
     ),
     style: CommitStyle = typer.Option(
         CommitStyle.default, "--style", "-s", 
-        help="Select output style: [cyan]concise[/cyan] (title only), [cyan]default[/cyan] (standard), or [cyan]detailed[/cyan] (bullet points)."
+        help="Select output style: [cyan]concise[/cyan], [cyan]default[/cyan], or [cyan]detailed[/cyan]."
     ),
     filter_ext: str = typer.Option(
         ".gml", "--filter", "-f", 
@@ -56,7 +60,6 @@ def main(
     """
     [bold]GitScribe[/bold] analyzes your staged changes and generates a semantic commit message using Gemini AI.
     """
-    # Se o usuário rodar um subcomando (ex: git-scribe config), não rodamos a lógica principal.
     if ctx.invoked_subcommand is not None:
         return
 
@@ -67,21 +70,45 @@ def main(
         ui.console.print("[error]✖ Not a git repository.[/error]")
         raise typer.Exit(1)
 
-    # 2. Staging Logic
+    # 2. Staging Logic (Intelligent)
+    
+    # Se --auto ou --add foram passados, damos stage all imediatamente
+    if auto or add_all:
+        ui.step_status("Staging all files (forced)...", "wait")
+        GitOps.stage_all()
+
+    # Obtém o diff atual
     diff = GitOps.get_staged_diff()
+    has_unstaged = GitOps.has_unstaged_changes()
+
+    # Cenário: Usuário tem coisas staged, MAS esqueceu outras coisas unstaged
+    if diff and has_unstaged and not auto:
+        ui.console.print("\n[warning]⚠ You have staged changes, but there are also unstaged files.[/warning]")
+        if Confirm.ask("[secondary]Do you want to include these unstaged files (git add .)? [/secondary]"):
+            GitOps.stage_all()
+            diff = GitOps.get_staged_diff() # Atualiza o diff
+            ui.step_status("Updated staging area.", "done")
+        else:
+            ui.console.print("[dim]Ignoring unstaged files. Committing only staged changes.[/dim]\n")
+
+    # Cenário: Nada staged 
     if not diff:
         ui.step_status("No staged changes found.", "wait")
         
-        if auto:
-            ui.step_status("Auto-staging all files...", "wait")
-            GitOps.stage_all()
-            diff = GitOps.get_staged_diff()
-        elif Confirm.ask("[secondary]Stage all files (git add .)?[/secondary]"):
-            GitOps.stage_all()
-            diff = GitOps.get_staged_diff()
-        
-        if not diff:
-            ui.console.print("[error]Nothing to commit. Aborting.[/error]")
+        # Se auto estava ligado, já tentamos dar stage_all lá em cima. Se ainda tá vazio, é pq não tem nada mesmo.
+        if auto: 
+            ui.console.print("[error]Nothing to commit (directory clean).[/error]")
+            raise typer.Exit()
+            
+        if has_unstaged:
+            if Confirm.ask("[secondary]Stage all files (git add .)?[/secondary]"):
+                GitOps.stage_all()
+                diff = GitOps.get_staged_diff()
+            else:
+                ui.console.print("[error]Nothing to commit. Aborting.[/error]")
+                raise typer.Exit()
+        else:
+            ui.console.print("[error]Nothing to commit (directory clean).[/error]")
             raise typer.Exit()
 
     # 3. Size Handling
@@ -90,7 +117,6 @@ def main(
         diff = GitOps.get_staged_diff(only_extensions=[filter_ext])
         if not diff or len(diff) > Config.MAX_DIFF_SIZE:
              diff = "" 
-             # Se context for None (pode acontecer dependendo da versão do typer), garante string vazia
              safe_context = context if context else ""
              context = safe_context + "\n(Full diff ignored due to size)"
 

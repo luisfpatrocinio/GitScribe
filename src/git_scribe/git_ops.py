@@ -116,3 +116,19 @@ class GitOps:
                 return f"{remote_url}/commit/{commit_hash}"
         except Exception:
             return None
+    
+    @staticmethod
+    def has_unstaged_changes() -> bool:
+        """
+        Checks if there are unstaged changes (modified files) or untracked files.
+        Returns True if there is anything that 'git add .' would pick up.
+        """
+        try:
+            # Check for modified but not staged
+            modified = GitOps._run(["git", "diff", "--name-only"], check=False)
+            # Check for untracked (new files)
+            untracked = GitOps._run(["git", "ls-files", "--others", "--exclude-standard"], check=False)
+            
+            return bool(modified.strip() or untracked.strip())
+        except Exception:
+            return False

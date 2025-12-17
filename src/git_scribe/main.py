@@ -10,9 +10,9 @@ from git_scribe.config import Config
 from git_scribe.git_ops import GitOps
 from git_scribe.ai_ops import AIGenerator
 
-# App configuration with Markdown Rich support in Help
+# Configuração do App
 app = typer.Typer(
-    help="[bold cyan]GitScribe[/bold cyan]: The AI-powered CLI to automate your git workflow. ✍️ 🤖",
+    help="[bold cyan]GitScribe[/bold cyan]: AI-powered commit generator. ✍️ 🤖",
     add_completion=False,
     rich_markup_mode="rich"
 )
@@ -27,19 +27,9 @@ def version_callback(value: bool):
         ui.console.print(f"[bold #0ce6f2]{Config.APP_NAME}[/bold #0ce6f2] v{__version__}")
         raise typer.Exit()
 
-@app.callback()
+@app.callback(invoke_without_command=True)
 def main(
-    version: Optional[bool] = typer.Option(
-        None, "--version", "-v", 
-        help="Show the application version and exit.", 
-        callback=version_callback, 
-        is_eager=True
-    )
-):
-    pass
-
-@app.command()
-def commit(
+    ctx: typer.Context,
     context: str = typer.Option(
         "", "--context", "-c", 
         help="Provide [bold]extra context[/bold] to the AI (e.g., 'Fixing login bug')."
@@ -55,11 +45,21 @@ def commit(
     filter_ext: str = typer.Option(
         ".gml", "--filter", "-f", 
         help="Specific file extension to [bold]prioritize[/bold] if the git diff exceeds the size limit."
+    ),
+    version: Optional[bool] = typer.Option(
+        None, "--version", "-v", 
+        help="Show the application version and exit.", 
+        callback=version_callback, 
+        is_eager=True
     )
 ):
     """
-    [bold]Analyze[/bold] staged changes, [bold]generate[/bold] a commit message using Gemini AI, and [bold]commit[/bold] to the repository.
+    [bold]GitScribe[/bold] analyzes your staged changes and generates a semantic commit message using Gemini AI.
     """
+    # Se o usuário rodar um subcomando (ex: git-scribe config), não rodamos a lógica principal.
+    if ctx.invoked_subcommand is not None:
+        return
+
     ui.print_banner()
 
     # 1. Repo Validation
@@ -90,7 +90,9 @@ def commit(
         diff = GitOps.get_staged_diff(only_extensions=[filter_ext])
         if not diff or len(diff) > Config.MAX_DIFF_SIZE:
              diff = "" 
-             context += "\n(Full diff ignored due to size)"
+             # Se context for None (pode acontecer dependendo da versão do typer), garante string vazia
+             safe_context = context if context else ""
+             context = safe_context + "\n(Full diff ignored due to size)"
 
     # 4. AI Generation
     try:
@@ -144,7 +146,6 @@ def commit(
             GitOps.push()
             ui.step_status("Push successful!", "done")
             
-            # Show commit link if available
             commit_url = GitOps.get_commit_url()
             if commit_url:
                 ui.print_commit_link(commit_url)
@@ -156,12 +157,10 @@ def commit(
                     GitOps.push(branch=current)
                     ui.step_status("Upstream set and pushed!", "done")
                     
-                    # Also displays the link if you created upstream now
                     commit_url = GitOps.get_commit_url()
                     if commit_url:
                         ui.print_commit_link(commit_url)
             else:
                 ui.console.print(f"[error]Push failed: {e}[/error]")
 
-    # Footer comes last of all
     ui.print_footer()

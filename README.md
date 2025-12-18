@@ -108,6 +108,7 @@ This project follows a professional modular architecture:
 
 ```text
 GitScribe/
+├── .gitscribe-context   # 👈 Context for the AI (Dogfooding)
 ├── src/git_scribe/
 │   ├── ai_ops.py    # Gemini API logic & Logging
 │   ├── git_ops.py   # Git subprocess wrapper

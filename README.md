@@ -11,15 +11,14 @@
 
 ---
 
-## 🚀 Features (v0.3.0)
+## 🚀 Features (v0.4.0)
 
 - **🤖 AI-Powered:** Uses Google's Gemini Flash model to understand code logic.
+- **🧠 Context-Aware:** Reads a `.gitscribe-context` file from your repo root to understand project-specific rules or languages.
 - **✨ Conventional Commits:** Ensures all messages follow the standard `type(scope): subject`.
 - **⚡ Direct Workflow:** Just run `git-scribe` and let the magic happen.
-- **🧠 Smart Staging:**
-  - Detects if you forgot to stage files and asks to include them.
-  - `--add` flag to force staging everything.
-  - `--auto` mode handles the full cycle (Stage -> Commit -> Push).
+- **🔍 Debug Mode:** Check exactly what was sent to the AI with `--last-prompt`.
+- **🏎️ Express Mode (`--auto`):** Automatically stages, commits, and pushes without confirmation.
 - **🎨 Adaptive Styles:** Choose your output style (`concise`, `default`, `detailed`).
 - **🛡️ Large Diff Handling:** Filters huge files automatically to prevent API errors.
 - **💎 Cyber Blue UI:** A beautiful, terminal-agnostic interface built with **Rich**.
@@ -76,39 +75,29 @@ git-scribe
 
 ### Options
 
-| Flag        | Short | Description                                                                       |
-| ----------- | ----- | --------------------------------------------------------------------------------- |
-| `--add`     | `-A`  | **Stage All:** Run `git add .` before generating the message.                     |
-| `--auto`    | `-a`  | **Express Mode:** Automatically stage all, commit, and push without confirmation. |
-| `--style`   | `-s`  | Output style: `concise`, `default`, or `detailed`.                                |
-| `--context` | `-c`  | Provide extra context to the AI (e.g., "Fixing the login bug").                   |
-| `--filter`  | `-f`  | Extension to prioritize if the diff is too large (Default: `.gml`).               |
-| `--help`    |       | Show detailed help and commands.                                                  |
+| Flag            | Short | Description                                                                       |
+| --------------- | ----- | --------------------------------------------------------------------------------- |
+| `--add`         | `-A`  | **Stage All:** Run `git add .` before generating the message.                     |
+| `--auto`        | `-a`  | **Express Mode:** Automatically stage all, commit, and push without confirmation. |
+| `--style`       | `-s`  | Output style: `concise`, `default`, or `detailed`.                                |
+| `--context`     | `-c`  | Provide extra context to the AI (e.g., "Fixing the login bug").                   |
+| `--last-prompt` |       | Show the exact prompt sent to Gemini in the last execution (Debug).               |
+| `--help`        |       | Show detailed help and commands.                                                  |
 
-### Examples
+---
 
-**Standard Interactive Workflow:**
+## 🧠 Advanced Usage: Project Context
 
-```bash
-git-scribe
-```
+GitScribe v0.4.0+ supports project-specific context.
+Create a file named `.gitscribe-context` in the root of your repository. GitScribe will read this file and send it to the AI to improve accuracy.
 
-**Forgot to add files? Stage everything and commit:**
+**Example `.gitscribe-context`:**
 
-```bash
-git-scribe --add
-```
-
-**Express Mode (For confident updates):**
-
-```bash
-git-scribe --auto
-```
-
-**Generate a detailed changelog message:**
-
-```bash
-git-scribe --style detailed
+```text
+Project: E-commerce Backend
+Language: Python (Django)
+Style: Formal, avoiding emojis in commit messages.
+Focus: Pay attention to database migration files.
 ```
 
 ---
@@ -120,7 +109,7 @@ This project follows a professional modular architecture:
 ```text
 GitScribe/
 ├── src/git_scribe/
-│   ├── ai_ops.py    # Gemini API logic & Prompt engineering
+│   ├── ai_ops.py    # Gemini API logic & Logging
 │   ├── git_ops.py   # Git subprocess wrapper
 │   ├── config.py    # Environment & Path management
 │   ├── main.py      # Typer CLI entry point

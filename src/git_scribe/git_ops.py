@@ -132,3 +132,11 @@ class GitOps:
             return bool(modified.strip() or untracked.strip())
         except Exception:
             return False
+
+    @staticmethod
+    def get_repo_root() -> Optional[str]:
+        """Returns the absolute path to the root of the git repository."""
+        try:
+            return GitOps._run(["git", "rev-parse", "--show-toplevel"], check=False)
+        except Exception:
+            return None

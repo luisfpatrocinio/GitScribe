@@ -1,0 +1,4 @@
+Project: GitScribe CLI Tool
+Language: Python (Typer, Rich)
+Goal: Automate git commits using AI.
+Style: Professional, clean code, strict typing.

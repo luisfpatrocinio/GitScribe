@@ -15,43 +15,40 @@ class AIGenerator:
             generation_config={"temperature": 0.7}
         )
         self.console = Console()
+        
+        # Ensure data directory exists
+        Config.ensure_data_dir()
 
-    def generate_commit_message(self, diff: str, context: str = "", style: str = "default") -> str:
-        """
-        Generates a commit message based on the diff and optional context.
-        
-        Args:
-            diff: The git diff string.
-            context: User provided context.
-            style: 'default', 'concise', or 'detailed'.
-        """
-        
+    def _save_last_prompt(self, prompt_parts: list):
+        """Saves the assembled prompt for debugging."""
+        try:
+            full_text = "\n".join([str(p) for p in prompt_parts])
+            with open(Config.LAST_PROMPT_FILE, "w", encoding="utf-8") as f:
+                f.write(full_text)
+        except Exception:
+            # Ignore log saving failures
+            pass
+
+    def generate_commit_message(self, diff: str, context: str = "", project_info: str = "", style: str = "default") -> str:
         base_instruction = (
             "You are an expert programmer writing a commit message following Conventional Commits specification.\n"
             "Format: <type>(<scope>): <subject>\n"
             "Use types: feat, fix, chore, docs, style, refactor, perf, test.\n"
         )
 
-        # Dynamic instructions based on chosen style
         style_instruction = ""
         if style == "concise":
-            style_instruction = (
-                "STRICT CONSTRAINT: Output ONLY the subject line (first line). "
-                "Do NOT write a body or description. Max 72 chars."
-            )
+            style_instruction = "STRICT: Output ONLY the subject line. Max 72 chars."
         elif style == "detailed":
-            style_instruction = (
-                "INSTRUCTION: Provide a standard subject line, followed by a blank line, "
-                "and then a detailed bulleted list (-) explaining the changes logic."
-            )
+            style_instruction = "INSTRUCTION: Provide a subject line, a blank line, and a detailed bulleted list."
         else:
-            style_instruction = (
-                "Keep the subject short. If necessary to explain 'why', add a brief body."
-            )
+            style_instruction = "Keep the subject short. If necessary, add a brief body."
 
+        # Build prompt
         full_prompt = [
             base_instruction,
             style_instruction,
+            f"Project Info: {project_info}" if project_info else "", 
             f"User Context: {context}" if context else "",
             "\n--- BEGIN GIT DIFF ---\n",
             diff,
@@ -59,11 +56,12 @@ class AIGenerator:
             "Generate the commit message:"
         ]
 
-        # Spinner with the new palette color (#0ce6f2)
+        # Save log before sending
+        self._save_last_prompt(full_prompt)
+
         with self.console.status("[#0ce6f2]Consulting Gemini AI...[/#0ce6f2]", spinner="dots"):
             try:
                 response = self.model.generate_content(full_prompt)
-                cleaned_message = response.text.strip().replace("`", "")
-                return cleaned_message
+                return response.text.strip().replace("`", "")
             except Exception as e:
                 raise RuntimeError(f"Gemini API Error: {str(e)}")
